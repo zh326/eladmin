@@ -25,7 +25,7 @@ public class TokenFilter extends GenericFilterBean {
 
    private final TokenProvider tokenProvider;
 
-   TokenFilter(TokenProvider tokenProvider) {
+   public TokenFilter(TokenProvider tokenProvider) {
       this.tokenProvider = tokenProvider;
    }
 

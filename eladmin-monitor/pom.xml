@@ -15,7 +15,7 @@
 	<artifactId>eladmin-monitor</artifactId>
 	<version>2.4</version>
 
-	<name>客户端监控模块</name>
+	<name>ELAdmin-monitor</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

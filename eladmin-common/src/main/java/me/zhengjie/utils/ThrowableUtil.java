@@ -22,6 +22,9 @@ public class ThrowableUtil {
         }
     }
 
+    /**
+     * 外键约束错误信息
+     */
     public static void throwForeignKeyException(Throwable e, String msg){
         Throwable t = e.getCause();
         while ((t != null) && !(t instanceof ConstraintViolationException)) {

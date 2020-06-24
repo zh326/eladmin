@@ -33,7 +33,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final TokenProvider tokenProvider;
     private final CorsFilter corsFilter;
+    //未认证，返回401 Unauthorized
     private final JwtAuthenticationEntryPoint authenticationErrorHandler;
+    //已认证未授权，返回403 Forbidden
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final ApplicationContext applicationContext;
 
@@ -60,6 +62,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         // 搜寻匿名标记 url： @AnonymousAccess
+        // 1、获取@Controller、@RequestMapping标记的对象，获取其方法
+        // 2、遍历方法，判断是否@AnonymousAccess标记
+        // 3、把@AnonymousAccess标记的方法添加到集合，用于配置Security放行的url
         Map<RequestMappingInfo, HandlerMethod> handlerMethodMap = applicationContext.getBean(RequestMappingHandlerMapping.class).getHandlerMethods();
         Set<String> anonymousUrls = new HashSet<>();
         for (Map.Entry<RequestMappingInfo, HandlerMethod> infoEntry : handlerMethodMap.entrySet()) {
@@ -116,10 +121,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(anonymousUrls.toArray(new String[0])).permitAll()
                 // 所有请求都需要认证
                 .anyRequest().authenticated()
-                .and().apply(securityConfigurerAdapter());
+                //添加token过滤器
+                .and()
+                .addFilterBefore(new TokenFilter(tokenProvider),UsernamePasswordAuthenticationFilter.class);
+                //.and().apply(securityConfigurerAdapter());
     }
 
-    private TokenConfigurer securityConfigurerAdapter() {
-        return new TokenConfigurer(tokenProvider);
-    }
+//    private TokenConfigurer securityConfigurerAdapter() {
+//        return new TokenConfigurer(tokenProvider);
+//    }
 }
