@@ -1,9 +1,25 @@
+/*
+ *  Copyright 2019-2020 Zheng Jie
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 package me.zhengjie.rest;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import me.zhengjie.aop.log.Log;
+import me.zhengjie.annotation.Log;
 import me.zhengjie.domain.QiniuConfig;
 import me.zhengjie.domain.QiniuContent;
 import me.zhengjie.service.dto.QiniuQueryCriteria;
@@ -26,26 +42,23 @@ import java.util.Map;
  */
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/qiNiuContent")
 @Api(tags = "工具：七牛云存储管理")
 public class QiniuController {
 
     private final QiNiuService qiNiuService;
 
-    public QiniuController(QiNiuService qiNiuService) {
-        this.qiNiuService = qiNiuService;
-    }
-
     @GetMapping(value = "/config")
-    public ResponseEntity<Object> get(){
+    public ResponseEntity<Object> queryConfig(){
         return new ResponseEntity<>(qiNiuService.find(), HttpStatus.OK);
     }
 
     @Log("配置七牛云存储")
     @ApiOperation("配置七牛云存储")
     @PutMapping(value = "/config")
-    public ResponseEntity<Object> emailConfig(@Validated @RequestBody QiniuConfig qiniuConfig){
-        qiNiuService.update(qiniuConfig);
+    public ResponseEntity<Object> updateConfig(@Validated @RequestBody QiniuConfig qiniuConfig){
+        qiNiuService.config(qiniuConfig);
         qiNiuService.update(qiniuConfig.getType());
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -60,7 +73,7 @@ public class QiniuController {
     @Log("查询文件")
     @ApiOperation("查询文件")
     @GetMapping
-    public ResponseEntity<Object> getRoles(QiniuQueryCriteria criteria, Pageable pageable){
+    public ResponseEntity<Object> query(QiniuQueryCriteria criteria, Pageable pageable){
         return new ResponseEntity<>(qiNiuService.queryAll(criteria,pageable),HttpStatus.OK);
     }
 

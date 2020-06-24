@@ -1,3 +1,18 @@
+/*
+ *  Copyright 2019-2020 Zheng Jie
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 package me.zhengjie.service.impl;
 
 import cn.hutool.http.HttpRequest;
@@ -5,6 +20,7 @@ import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.zhengjie.domain.Picture;
 import me.zhengjie.repository.PictureRepository;
@@ -13,10 +29,8 @@ import me.zhengjie.service.dto.PictureQueryCriteria;
 import me.zhengjie.exception.BadRequestException;
 import me.zhengjie.utils.*;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
@@ -29,25 +43,16 @@ import java.util.*;
  * @date 2018-12-27
  */
 @Slf4j
+@RequiredArgsConstructor
 @Service(value = "pictureService")
-@CacheConfig(cacheNames = "picture")
-@Transactional(propagation = Propagation.SUPPORTS, readOnly = true, rollbackFor = Exception.class)
 public class PictureServiceImpl implements PictureService {
 
     @Value("${smms.token}")
     private String token;
-
     private final PictureRepository pictureRepository;
-
     private static final String SUCCESS = "success";
-
     private static final String CODE = "code";
-
     private static final String MSG = "message";
-
-    public PictureServiceImpl(PictureRepository pictureRepository) {
-        this.pictureRepository = pictureRepository;
-    }
 
     @Override
     public Object queryAll(PictureQueryCriteria criteria, Pageable pageable){
@@ -126,7 +131,7 @@ public class PictureServiceImpl implements PictureService {
             if(!pictureRepository.existsByUrl(picture.getUrl())){
                 picture.setSize(FileUtil.getSize(Integer.parseInt(picture.getSize())));
                 picture.setUsername("System Sync");
-                picture.setMd5Code("");
+                picture.setMd5Code(null);
                 pictureRepository.save(picture);
             }
         }
